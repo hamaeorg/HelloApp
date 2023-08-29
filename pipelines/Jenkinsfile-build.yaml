@@ -3,6 +3,9 @@ pipeline:
     node:
       label: 'java-build-node-2'
   stages:
+    - stage: "worskpace cleanup"
+      steps:
+        - sh "rm -rf *"
     - stage: "log git and java versions"
       steps:
         - sh "java --version"
@@ -11,3 +14,5 @@ pipeline:
       steps:
         - sh "git clone https://github.com/hamaeorg/HelloApp.git"
         - sh "ls"
+        - sh "chmod +x ./HelloApp/HelloApp/gradlew"
+        - sh "./HelloApp/HelloApp/gradlew -p HelloApp/HelloApp/ build"
