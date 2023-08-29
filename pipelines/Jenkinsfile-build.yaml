@@ -7,3 +7,7 @@ pipeline:
       steps:
         - sh "java --version"
         - sh "git --version"
+    - stage: 'Build java application'
+      steps:
+        - sh "git clone https://github.com/hamaeorg/HelloApp.git"
+        - sh "ls"
