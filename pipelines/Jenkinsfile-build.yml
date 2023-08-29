@@ -1,0 +1,9 @@
+pipeline:
+  agent:
+    node:
+      label: 'java-build-node'
+  stages:
+    - stage: "log git and java versions"
+      steps:
+        - sh "java --version"
+        - sh "git --version"
