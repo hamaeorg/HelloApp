@@ -1,7 +1,7 @@
 pipeline:
   agent:
     node:
-      label: 'java-build-node'
+      label: 'java-build-node-2'
   stages:
     - stage: "log git and java versions"
       steps:
