@@ -6,7 +6,7 @@ plugins {
 
 jar.enabled = false
 
-version = '0.0.1'
+version project.hasProperty('appVersion') ? project.appVersion : 'defaultVersion'
 
 java {
 	sourceCompatibility = '17'
