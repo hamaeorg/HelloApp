@@ -9,10 +9,6 @@ pipeline:
     - stage: "worskpace cleanup"
       steps:
         - sh "rm -rf *"
-    - stage: "log git and java versions"
-      steps:
-        - sh "java --version"
-        - sh "git --version"
     - stage: 'Build java application'
       steps:
         - sh "git clone https://github.com/hamaeorg/HelloApp.git"
