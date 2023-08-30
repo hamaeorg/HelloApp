@@ -1,7 +1,10 @@
 pipeline:
   agent:
     node:
-      label: 'java-build-node-2'
+      label: 'java-build-node-3'
+  environment:
+    ECR: credentials('aws-ECR')
+    VERSION: '0.0.2'
   stages:
     - stage: "worskpace cleanup"
       steps:
@@ -15,11 +18,11 @@ pipeline:
         - sh "git clone https://github.com/hamaeorg/HelloApp.git"
         - sh "ls"
         - sh "chmod +x ./HelloApp/HelloApp/gradlew"
-        - sh "./HelloApp/HelloApp/gradlew -p HelloApp/HelloApp/ build --no-daemon"
+        - sh "./HelloApp/HelloApp/gradlew -p HelloApp/HelloApp/ build '-PappVersion=${VERSION}' --no-daemon"
     - stage: 'containerize application'
       steps:
-        - sh "cd HelloApp && sudo docker build -t hello ."
-        - sh "sudo docker tag hello:latest 632014178293.dkr.ecr.eu-north-1.amazonaws.com/hello:0.0.1"
+        - sh "cd HelloApp && sudo docker build --build-arg VERSION=${VERSION} -t hello ."
+        - sh "sudo docker tag hello:latest 632014178293.dkr.ecr.eu-north-1.amazonaws.com/hello:'${VERSION}'"
         - sh "sudo docker images"
     - stage: 'push image to registry'
       steps:
@@ -28,4 +31,4 @@ pipeline:
         - sh "sudo aws configure set region 'eu-north-1'"
         - sh "sudo aws configure set output 'json'"
         - sh "sudo aws ecr get-login-password --region eu-north-1 | sudo docker login --username AWS --password-stdin 632014178293.dkr.ecr.eu-north-1.amazonaws.com"
-        - sh "sudo docker push 632014178293.dkr.ecr.eu-north-1.amazonaws.com/hello:0.0.1"
+        - sh "sudo docker push 632014178293.dkr.ecr.eu-north-1.amazonaws.com/hello:'${VERSION}'"
