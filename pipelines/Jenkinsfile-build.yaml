@@ -3,7 +3,8 @@ pipeline:
     node:
       label: 'java-build-node-3'
   environment:
-    ECR: credentials('aws-ECR')
+    DOCKER: credentials('docker-login')
+    ECR: '632014178293.dkr.ecr.eu-north-1.amazonaws.com'
     VERSION: '0.0.3'
   stages:
     - stage: "worskpace cleanup"
@@ -18,13 +19,9 @@ pipeline:
     - stage: 'containerize application'
       steps:
         - sh "cd HelloApp && sudo docker build --build-arg VERSION=${VERSION} -t hello ."
-        - sh "sudo docker tag hello:latest 632014178293.dkr.ecr.eu-north-1.amazonaws.com/hello:'${VERSION}'"
+        - sh "sudo docker tag hello:latest ${ECR}/hello:${VERSION}"
         - sh "sudo docker images"
     - stage: 'push image to registry'
       steps:
-        - sh "sudo aws configure set aws_access_key_id '${ECR_USR}'"
-        - sh "sudo aws configure set aws_secret_access_key '${ECR_PSW}'"
-        - sh "sudo aws configure set region 'eu-north-1'"
-        - sh "sudo aws configure set output 'json'"
-        - sh "sudo aws ecr get-login-password --region eu-north-1 | sudo docker login --username AWS --password-stdin 632014178293.dkr.ecr.eu-north-1.amazonaws.com"
-        - sh "sudo docker push 632014178293.dkr.ecr.eu-north-1.amazonaws.com/hello:'${VERSION}'"
+        - sh "sudo docker login -u ${DOCKER_USR} -p ${DOCKER_PSW} ${ECR}"
+        - sh "sudo docker push ${ECR}/hello:${VERSION}"
