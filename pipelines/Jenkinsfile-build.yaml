@@ -5,7 +5,7 @@ pipeline:
   environment:
     DOCKER: credentials('docker-login')
     ECR: '632014178293.dkr.ecr.eu-north-1.amazonaws.com'
-    VERSION: '0.0.3'
+    VERSION: '0.0.4'
   stages:
     - stage: "worskpace cleanup"
       steps:
