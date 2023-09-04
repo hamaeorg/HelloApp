@@ -5,7 +5,8 @@ pipeline:
   environment:
     DOCKER: credentials('docker-login')
     ECR: '632014178293.dkr.ecr.eu-north-1.amazonaws.com'
-    VERSION: '0.0.6'
+    VERSION: '0.1'
+    DYNAMIC_VERSION: '${VERSION}.${BUILD_NUMBER}'
   stages:
     - stage: "worskpace cleanup"
       steps:
@@ -15,16 +16,16 @@ pipeline:
         - sh "git clone https://github.com/hamaeorg/HelloApp.git"
         - sh "ls"
         - sh "chmod +x ./HelloApp/HelloApp/gradlew"
-        - sh "./HelloApp/HelloApp/gradlew -p HelloApp/HelloApp/ build '-PappVersion=${VERSION}' --no-daemon"
+        - sh "./HelloApp/HelloApp/gradlew -p HelloApp/HelloApp/ build -PappVersion=${DYNAMIC_VERSION} --no-daemon"
     - stage: 'containerize application'
       steps:
-        - sh "cd HelloApp && sudo docker build --build-arg VERSION=${VERSION} -t hello ."
-        - sh "sudo docker tag hello:latest ${ECR}/hello:${VERSION}"
+        - sh "cd HelloApp && sudo docker build --build-arg VERSION=${DYNAMIC_VERSION} -t hello ."
+        - sh "sudo docker tag hello:latest ${ECR}/hello:${DYNAMIC_VERSION}"
         - sh "sudo docker images"
     - stage: 'push image to registry'
       steps:
         - sh "sudo docker login -u ${DOCKER_USR} -p ${DOCKER_PSW} ${ECR}"
-        - sh "sudo docker push ${ECR}/hello:${VERSION}"
+        - sh "sudo docker push ${ECR}/hello:${DYNAMIC_VERSION}"
 
     - stage: "deploy"
       steps:
@@ -37,4 +38,4 @@ pipeline:
         - sh "kubectl config current-context"
         - sh "kubectl config get-contexts"
         - sh "kubectl get pods"
-        - sh "helm upgrade hello ./HelloApp/helm --set image.tag=${VERSION}"
+        - sh "helm upgrade hello ./HelloApp/helm --set image.tag=${DYNAMIC_VERSION}"
