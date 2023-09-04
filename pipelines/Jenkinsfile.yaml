@@ -25,3 +25,16 @@ pipeline:
       steps:
         - sh "sudo docker login -u ${DOCKER_USR} -p ${DOCKER_PSW} ${ECR}"
         - sh "sudo docker push ${ECR}/hello:${VERSION}"
+
+    - stage: "deploy"
+      steps:
+        - sh "echo deploying"
+        - sh "sudo aws configure set aws_access_key_id '${AWS_USR}'"
+        - sh "sudo aws configure set aws_secret_access_key '${AWS_PSW}'"
+        - sh "sudo aws configure set region 'eu-north-1'"
+        - sh "sudo aws configure set output 'json'"
+        - sh "aws eks --region eu-north-1 update-kubeconfig --name hello"
+        - sh "kubectl config current-context"
+        - sh "kubectl config get-contexts"
+        - sh "kubectl get pods"
+        - sh "helm upgrade hello ./HelloApp/helm --set image.tag=${VERSION}"
