@@ -4,6 +4,7 @@ pipeline:
       label: 'java-build-node-3'
   environment:
     DOCKER: credentials('docker-login')
+    AWS: credentials('aws')
     ECR: '632014178293.dkr.ecr.eu-north-1.amazonaws.com'
     VERSION: '0.1'
     DYNAMIC_VERSION: '${VERSION}.${BUILD_NUMBER}'
